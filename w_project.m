@@ -1,0 +1,31 @@
+k = 2*pi/(3.6*10^-6);
+w = 30*10^(-6);
+step = (2^0.5)*pi/k;
+x=[-5*w:step:0+step step:step:5*w+step];
+y=[-5*w:step:0+step step:step:5*w+step];
+[X,Y] = meshgrid(x,y);
+r = X.^2 + Y.^2;
+z = exp(-r/w^2); 
+n = length(x);
+fs = 1/step;
+kx= 2*pi*linspace(-fs/2,fs/2,n);
+ky= 2*pi*linspace(-fs/2,fs/2,n);
+o = fftshift(fft2(z));
+%imagesc(kx,ky,abs(fftshift(o))/n);
+%imagesc(kx,ky,angle(fftshift(o)));
+[KX,KY] = meshgrid(kx,ky);
+zo = ((w^2)*k)/2;
+KZ = k - ((KX.^2+KY.^2)/(2*k));
+oz = (o.*exp(-1i.*KZ.*(2*zo)));
+ozt = ifft2(ifftshift(oz));
+subplot(2,1,1);
+imagesc(x,y,abs(ozt).^2);
+colorbar
+caxis([0 0.3])
+f = ceil(n/2);
+m = abs(ozt(:,f)).^2;
+j = m.';
+subplot(2,1,2);
+plot(x,j);
+ylim([0 1]);
+xlim([-5*w 5*w]);
